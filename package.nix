@@ -2,7 +2,10 @@
   lib,
   stdenv,
   fetchzip,
+  fetchurl,
   autoPatchelfHook,
+  makeDesktopItem,
+  copyDesktopItems,
   alsa-lib,
   at-spi2-core,
   atk,
@@ -40,7 +43,15 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-Oesw09et2tJOx1O1w0FOJje6F1+o0cTyBmziTAtKgw0=";
   };
 
-  nativeBuildInputs = [ autoPatchelfHook ];
+  icon = fetchurl {
+    url = "https://raw.githubusercontent.com/inkle/inky/${finalAttrs.version}/resources/Icon1024.png";
+    hash = "sha256-EUl8CtnR46XV8KQCk/o//Z/J7RTvH3A1GNR0eSNvMEw=";
+  };
+
+  nativeBuildInputs = [
+    autoPatchelfHook
+    copyDesktopItems
+  ];
 
   buildInputs = [
     alsa-lib
@@ -71,6 +82,20 @@ stdenv.mkDerivation (finalAttrs: {
     zlib
   ];
 
+  desktopItems = [
+    (makeDesktopItem {
+      name = "inky";
+      exec = "inky %F";
+      icon = "inky";
+      desktopName = "Inky";
+      comment = "Editor for ink, inkle's narrative scripting language";
+      categories = [
+        "Development"
+        "TextEditor"
+      ];
+    })
+  ];
+
   installPhase = ''
     runHook preInstall
 
@@ -78,6 +103,8 @@ stdenv.mkDerivation (finalAttrs: {
     cp -r . $out/share/inky
     chmod -R u+w $out/share/inky
     ln -s $out/share/inky/Inky $out/bin/inky
+
+    install -Dm644 $icon $out/share/icons/hicolor/1024x1024/apps/inky.png
 
     runHook postInstall
   '';
