@@ -4,6 +4,7 @@
   fetchzip,
   fetchurl,
   autoPatchelfHook,
+  makeWrapper,
   makeDesktopItem,
   copyDesktopItems,
   alsa-lib,
@@ -19,10 +20,16 @@
   icu,
   libdrm,
   libxkbcommon,
+  libglvnd,
+  libnotify,
+  libsecret,
   mesa,
   nspr,
   nss,
+  openssl,
   pango,
+  pipewire,
+  systemd,
   libx11,
   libxcb,
   libxcomposite,
@@ -50,6 +57,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     autoPatchelfHook
+    makeWrapper
     copyDesktopItems
   ];
 
@@ -82,6 +90,17 @@ stdenv.mkDerivation (finalAttrs: {
     zlib
   ];
 
+  runtimeDependencies = [
+    icu
+    libglvnd
+    libnotify
+    libsecret
+    openssl
+    pipewire
+    (lib.getLib systemd)
+    zlib
+  ];
+
   desktopItems = [
     (makeDesktopItem {
       name = "inky";
@@ -102,7 +121,9 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p $out/share/inky $out/bin
     cp -r . $out/share/inky
     chmod -R u+w $out/share/inky
-    ln -s $out/share/inky/Inky $out/bin/inky
+
+    makeWrapper $out/share/inky/Inky $out/bin/inky \
+      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}"
 
     install -Dm644 $icon $out/share/icons/hicolor/1024x1024/apps/inky.png
 
