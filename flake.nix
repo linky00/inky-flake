@@ -14,5 +14,13 @@
         inky = pkgs.callPackage ./package.nix { };
         default = self.packages.${system}.inky;
       };
+
+      overlays.default = final: prev: {
+        inky = final.callPackage ./package.nix { };
+      };
+
+      formatter.${system} = pkgs.nixfmt-tree;
+
+      checks.${system}.inky = self.packages.${system}.inky;
     };
 }
