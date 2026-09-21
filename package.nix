@@ -123,7 +123,7 @@ stdenv.mkDerivation (finalAttrs: {
     chmod -R u+w $out/share/inky
 
     makeWrapper $out/share/inky/Inky $out/bin/inky \
-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}"
+      --add-flags "--ozone-platform=x11"
 
     install -Dm644 $icon $out/share/icons/hicolor/1024x1024/apps/inky.png
 
